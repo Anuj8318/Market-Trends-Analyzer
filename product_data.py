@@ -5,8 +5,6 @@ import mysql.connector as my
 from dotenv import load_dotenv
 import os
 
-
-
 # Load environment variables from .env file
 load_dotenv()
 
@@ -16,18 +14,69 @@ db_user = os.getenv("DB_USER")
 db_password = os.getenv("DB_PASSWORD")
 db_name = os.getenv("DB_NAME")
 
-
-
-
 # Number of products
 num_products = 50
 
-# Generate product data
-np.random.seed(42)
+# Predefined product items with actual names
+product_data = [
+    {"product_name": "Smartphone", "category": "Electronics", "sub_category": "Gadgets"},
+    {"product_name": "Laptop", "category": "Electronics", "sub_category": "Gadgets"},
+    {"product_name": "T-shirt", "category": "Clothing", "sub_category": "Apparel"},
+    {"product_name": "Blender", "category": "Home & Kitchen", "sub_category": "Appliances"},
+    {"product_name": "Running Shoes", "category": "Sports", "sub_category": "Equipment"},
+    {"product_name": "Tablet", "category": "Electronics", "sub_category": "Gadgets"},
+    {"product_name": "Jeans", "category": "Clothing", "sub_category": "Apparel"},
+    {"product_name": "Non-Fiction Book", "category": "Books", "sub_category": "Fiction"},
+    {"product_name": "Smartwatch", "category": "Electronics", "sub_category": "Gadgets"},
+    {"product_name": "Headphones", "category": "Electronics", "sub_category": "Gadgets"},
+    {"product_name": "Gaming Console", "category": "Electronics", "sub_category": "Gadgets"},
+    {"product_name": "Blender", "category": "Home & Kitchen", "sub_category": "Appliances"},
+    {"product_name": "Coffee Maker", "category": "Home & Kitchen", "sub_category": "Appliances"},
+    {"product_name": "Fiction Book", "category": "Books", "sub_category": "Fiction"},
+    {"product_name": "Action Camera", "category": "Electronics", "sub_category": "Gadgets"},
+    {"product_name": "Basketball", "category": "Sports", "sub_category": "Equipment"},
+    {"product_name": "Sneakers", "category": "Clothing", "sub_category": "Apparel"},
+    {"product_name": "Vacuum Cleaner", "category": "Home & Kitchen", "sub_category": "Appliances"},
+    {"product_name": "Yoga Mat", "category": "Sports", "sub_category": "Equipment"},
+    {"product_name": "Electric Kettle", "category": "Home & Kitchen", "sub_category": "Appliances"},
+    {"product_name": "Microwave Oven", "category": "Home & Kitchen", "sub_category": "Appliances"},
+    {"product_name": "Cookware Set", "category": "Home & Kitchen", "sub_category": "Appliances"},
+    {"product_name": "Cycling Helmet", "category": "Sports", "sub_category": "Equipment"},
+    {"product_name": "Ski Goggles", "category": "Sports", "sub_category": "Equipment"},
+    {"product_name": "Bluetooth Speaker", "category": "Electronics", "sub_category": "Gadgets"},
+    {"product_name": "Wireless Mouse", "category": "Electronics", "sub_category": "Gadgets"},
+    {"product_name": "Fitness Tracker", "category": "Electronics", "sub_category": "Gadgets"},
+    {"product_name": "LED TV", "category": "Electronics", "sub_category": "Gadgets"},
+    {"product_name": "Smart Light Bulb", "category": "Electronics", "sub_category": "Gadgets"},
+    {"product_name": "Cordless Drill", "category": "Home & Kitchen", "sub_category": "Appliances"},
+    {"product_name": "Graphic T-Shirt", "category": "Clothing", "sub_category": "Apparel"},
+    {"product_name": "Baseball Glove", "category": "Sports", "sub_category": "Equipment"},
+    {"product_name": "Electric Scooter", "category": "Electronics", "sub_category": "Gadgets"},
+    {"product_name": "Electric Toothbrush", "category": "Home & Kitchen", "sub_category": "Appliances"},
+    {"product_name": "3D Printer", "category": "Electronics", "sub_category": "Gadgets"},
+    {"product_name": "Drone", "category": "Electronics", "sub_category": "Gadgets"},
+    {"product_name": "Air Purifier", "category": "Home & Kitchen", "sub_category": "Appliances"},
+    {"product_name": "Tennis Racket", "category": "Sports", "sub_category": "Equipment"},
+    {"product_name": "Camera Lens", "category": "Electronics", "sub_category": "Gadgets"},
+    {"product_name": "Instant Pot", "category": "Home & Kitchen", "sub_category": "Appliances"},
+    {"product_name": "Electric Grill", "category": "Home & Kitchen", "sub_category": "Appliances"},
+    {"product_name": "Treadmill", "category": "Sports", "sub_category": "Equipment"},
+    {"product_name": "Air Fryer", "category": "Home & Kitchen", "sub_category": "Appliances"},
+    {"product_name": "Sound Bar", "category": "Electronics", "sub_category": "Gadgets"},
+    {"product_name": "Robot Vacuum", "category": "Home & Kitchen", "sub_category": "Appliances"},
+    {"product_name": "Virtual Reality Headset", "category": "Electronics", "sub_category": "Gadgets"},
+    {"product_name": "Mountain Bike", "category": "Sports", "sub_category": "Equipment"},
+    {"product_name": "Electric Shaver", "category": "Home & Kitchen", "sub_category": "Appliances"},
+]
+
+# Expand product data to 50 items
+product_data_expanded = (product_data * (num_products // len(product_data) + 1))[:num_products]
+
+# Generate product IDs
 product_ids = [f"PROD{str(i).zfill(4)}" for i in range(1, num_products + 1)]
-product_names = [f"Product {i}" for i in range(1, num_products + 1)]
-categories = np.random.choice(['Electronics', 'Clothing', 'Books', 'Home & Kitchen', 'Sports'], size=num_products)
-sub_categories = np.random.choice(['Gadgets', 'Apparel', 'Fiction', 'Appliances', 'Equipment'], size=num_products)
+
+# Generate random prices and stock levels
+np.random.seed(42)
 original_prices = np.round(np.random.uniform(10, 1000, size=num_products), 2)
 selling_prices = np.round(original_prices - np.random.uniform(1, 50, size=num_products), 2)
 stocks = np.random.randint(0, 100, size=num_products)
@@ -35,9 +84,9 @@ stocks = np.random.randint(0, 100, size=num_products)
 # Create a DataFrame
 products_df = pd.DataFrame({
     'product_id': product_ids,
-    'product_name': product_names,
-    'category': categories,
-    'sub_category': sub_categories,
+    'product_name': [item['product_name'] for item in product_data_expanded],
+    'category': [item['category'] for item in product_data_expanded],
+    'sub_category': [item['sub_category'] for item in product_data_expanded],
     'original_price': original_prices,
     'selling_price': selling_prices,
     'stock': stocks
@@ -46,7 +95,7 @@ products_df = pd.DataFrame({
 # Display the first few rows
 print(products_df.head())
 
-# Establish connection
+# Establish connection to MySQL
 con = my.connect(
     host=db_host,
     user=db_user,
@@ -71,8 +120,7 @@ CREATE TABLE IF NOT EXISTS product (
 """
 cursor.execute(create_table_query)
 
-# Insert data into the table
-# Insert data into the product table with update option for duplicates
+# Insert data into the product table
 for index, row in products_df.iterrows():
     insert_query = """
     INSERT INTO product (product_id, product_name, category, sub_category, original_price, selling_price, stock)
@@ -86,7 +134,6 @@ for index, row in products_df.iterrows():
     stock = VALUES(stock)
     """
     cursor.execute(insert_query, tuple(row))
-
 
 # Commit the changes
 con.commit()
